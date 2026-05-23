@@ -1,0 +1,79 @@
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeSlideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes growWidth {
+  from { width: 0 !important; }
+  to   { /* natural width */ }
+}
+
+.anim-fade-up {
+  animation: fadeSlideUp 0.4s cubic-bezier(0.4,0,0.2,1) both;
+}
+.anim-scale-in {
+  animation: scaleIn 0.35s cubic-bezier(0.4,0,0.2,1) both;
+}
+
+/* Staggered row entry */
+.proc-table tbody tr {
+  animation: fadeSlideUp 0.25s ease both;
+}
+.proc-table tbody tr:nth-child(1) { animation-delay: 0.03s; }
+.proc-table tbody tr:nth-child(2) { animation-delay: 0.06s; }
+.proc-table tbody tr:nth-child(3) { animation-delay: 0.09s; }
+.proc-table tbody tr:nth-child(4) { animation-delay: 0.12s; }
+.proc-table tbody tr:nth-child(5) { animation-delay: 0.15s; }
+.proc-table tbody tr:nth-child(6) { animation-delay: 0.18s; }
+
+/* Gantt blocks animate in */
+.gantt-block {
+  animation: fadeIn 0.35s ease both;
+}
+.gantt-block:nth-child(1) { animation-delay: 0.05s; }
+.gantt-block:nth-child(2) { animation-delay: 0.1s; }
+.gantt-block:nth-child(3) { animation-delay: 0.15s; }
+.gantt-block:nth-child(4) { animation-delay: 0.2s; }
+.gantt-block:nth-child(5) { animation-delay: 0.25s; }
+.gantt-block:nth-child(6) { animation-delay: 0.3s; }
+.gantt-block:nth-child(7) { animation-delay: 0.35s; }
+
+/* Metric card stagger */
+.metric-card {
+  animation: fadeSlideUp 0.38s ease both;
+}
+.metric-card:nth-child(1) { animation-delay: 0.05s; }
+.metric-card:nth-child(2) { animation-delay: 0.10s; }
+.metric-card:nth-child(3) { animation-delay: 0.15s; }
+.metric-card:nth-child(4) { animation-delay: 0.20s; }
+
+/* Output section */
+#simOutput, #compareOutput {
+  animation: fadeSlideUp 0.4s ease;
+}
+
+/* Pulse on run button click */
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgba(79,126,248,0.45); }
+  70%  { box-shadow: 0 0 0 10px rgba(79,126,248,0); }
+  100% { box-shadow: 0 0 0 0 rgba(79,126,248,0); }
+}
+.btn-primary:active { animation: pulse-ring 0.5s ease; }

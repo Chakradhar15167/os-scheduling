@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CPU Scheduling Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/gantt.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+
+  <!-- Background decorative blobs -->
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+
+  <div class="app-wrapper">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="logo">
+          <div class="logo-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+            </svg>
+          </div>
+          <div>
+            <div class="logo-title">CPU Scheduler</div>
+            <div class="logo-sub">OS Simulation Lab</div>
+          </div>
+        </div>
+        <nav class="nav-tabs" id="navTabs">
+          <button class="nav-tab active" data-algo="fcfs">FCFS</button>
+          <button class="nav-tab" data-algo="sjf">SJF</button>
+          <button class="nav-tab" data-algo="rr">Round Robin</button>
+          <button class="nav-tab" data-algo="priority">Priority</button>
+          <button class="nav-tab compare-tab" data-algo="compare">⇄ Compare</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="main">
+
+      <!-- ALGO INFO BANNER -->
+      <div class="algo-banner" id="algoBanner">
+        <div class="algo-banner-icon" id="algoBannerIcon">📋</div>
+        <div>
+          <div class="algo-banner-title" id="algoBannerTitle">First Come First Serve</div>
+          <div class="algo-banner-desc" id="algoBannerDesc">Processes execute in arrival order. Simple, fair, but may cause convoy effect.</div>
+        </div>
+        <div class="algo-badge" id="algoBadge">Non-Preemptive</div>
+      </div>
+
+      <div class="content-grid">
+
+        <!-- LEFT PANEL -->
+        <section class="panel input-panel">
+          <div class="panel-header">
+            <span class="panel-title">Process Configuration</span>
+            <button class="icon-btn" onclick="App.loadExample()" title="Load example">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+              Load Example
+            </button>
+          </div>
+
+          <!-- RR Quantum -->
+          <div class="quantum-box" id="quantumBox" style="display:none">
+            <label class="field-label">Time Quantum</label>
+            <div class="quantum-control">
+              <button class="q-btn" onclick="App.changeQuantum(-1)">−</button>
+              <span class="q-val" id="quantumVal">3</span>
+              <button class="q-btn" onclick="App.changeQuantum(1)">+</button>
+              <span class="q-unit">time units</span>
+            </div>
+          </div>
+
+          <!-- Process Table -->
+          <div class="table-wrap">
+            <table class="proc-table" id="procTable">
+              <thead>
+                <tr>
+                  <th>Process</th>
+                  <th>Arrival</th>
+                  <th>Burst</th>
+                  <th class="priority-col" id="priorityHeader" style="display:none">Priority</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="procBody"></tbody>
+            </table>
+          </div>
+
+          <div class="action-row">
+            <button class="btn btn-ghost" onclick="App.addProcess()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+              Add Process
+            </button>
+            <button class="btn btn-primary" onclick="App.runSim()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Run Simulation
+            </button>
+          </div>
+
+          <button class="btn btn-reset" onclick="App.reset()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>
+            Clear All
+          </button>
+        </section>
+
+        <!-- RIGHT PANEL -->
+        <section class="panel result-panel" id="resultPanel">
+          <div class="empty-state" id="emptyState">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 8h10M7 12h6"/></svg>
+            </div>
+            <p>Configure processes and click <strong>Run Simulation</strong> to see results</p>
+          </div>
+
+          <div id="simOutput" style="display:none">
+
+            <!-- Gantt Chart -->
+            <div class="output-section">
+              <div class="section-hd">
+                <span class="section-title">Gantt Chart</span>
+                <span class="section-badge" id="ganttDuration"></span>
+              </div>
+              <div class="gantt-container" id="ganttContainer"></div>
+              <div class="gantt-legend" id="ganttLegend"></div>
+            </div>
+
+            <!-- Metric Cards -->
+            <div class="output-section">
+              <div class="section-hd"><span class="section-title">Performance Metrics</span></div>
+              <div class="metrics-grid" id="metricsGrid"></div>
+            </div>
+
+            <!-- Result Table -->
+            <div class="output-section">
+              <div class="section-hd"><span class="section-title">Process Details</span></div>
+              <div class="table-wrap">
+                <table class="result-table">
+                  <thead>
+                    <tr>
+                      <th>Process</th>
+                      <th>Arrival</th>
+                      <th>Burst</th>
+                      <th>Finish</th>
+                      <th>Turnaround</th>
+                      <th>Waiting</th>
+                      <th>Response</th>
+                    </tr>
+                  </thead>
+                  <tbody id="resultBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Compare Output -->
+          <div id="compareOutput" style="display:none">
+            <div class="output-section">
+              <div class="section-hd"><span class="section-title">Algorithm Comparison</span></div>
+              <div id="compareCards" class="compare-grid"></div>
+            </div>
+            <div class="output-section">
+              <div class="section-hd"><span class="section-title">Visual Comparison</span></div>
+              <canvas id="compareChart" height="240"></canvas>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
+
+    <footer class="footer">
+      <span>CPU Scheduling Simulator &nbsp;·&nbsp; OS Project &nbsp;·&nbsp; Built with vanilla JS</span>
+    </footer>
+  </div>
+
+  <script src="js/algorithms.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
